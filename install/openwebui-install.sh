@@ -23,7 +23,9 @@ msg_ok "Installed Dependencies"
 msg_info "Setup Python3"
 $STD apt-get install -y --no-install-recommends \
   python3 \
-  python3-pip
+  python3-pip \
+  python3-setuptools \
+  python3-wheel
 msg_ok "Setup Python3"
 
 NODE_VERSION="22" setup_nodejs
@@ -48,7 +50,7 @@ msg_ok "Installed Open WebUI"
 read -r -p "${TAB3}Would you like to add Ollama? <y/N> " prompt
 if [[ ${prompt,,} =~ ^(y|yes)$ ]]; then
   msg_info "Installing Ollama"
-  curl --fail --show-error --location --progress-bar --http1.1 --retry 5 --retry-delay 10 --verbose -C - -fsSLO https://ollama.com/download/ollama-linux-amd64.tgz
+  curl --progress-bar --http1.1 --retry 5 --retry-delay 10 --keepalive-time 60 --max-time 7200 -C - -fsSLO --limit-rate 3M https://ollama.com/download/ollama-linux-amd64.tgz
   tar -C /usr -xzf ollama-linux-amd64.tgz
   rm -rf ollama-linux-amd64.tgz
 
@@ -78,7 +80,7 @@ EOF
 
   # --- AMD ROCm installation ---
   msg_info "Installing ROCm for AMD GPU"
-  curl --fail --show-error --location --progress-bar --http1.1 --retry 5 --retry-delay 10 --verbose -C - -fsSLO https://ollama.com/download/ollama-linux-amd64-rocm.tgz
+  curl --progress-bar --http1.1 --retry 5 --retry-delay 10 --keepalive-time 60 --max-time 7200 -C - -fsSLO --limit-rate 3M https://ollama.com/download/ollama-linux-amd64-rocm.tgz
   tar -C /usr -xzf ollama-linux-amd64-rocm.tgz
   rm -rf ollama-linux-amd64-rocm.tgz
   msg_ok "ROCm libraries installed for AMD GPU"
