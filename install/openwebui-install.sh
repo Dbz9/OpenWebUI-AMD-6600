@@ -51,6 +51,7 @@ if [[ ${prompt,,} =~ ^(y|yes)$ ]]; then
   curl -fsSLO -C - https://ollama.com/download/ollama-linux-amd64.tgz
   tar -C /usr -xzf ollama-linux-amd64.tgz
   rm -rf ollama-linux-amd64.tgz
+
   cat <<EOF >/etc/systemd/system/ollama.service
 [Unit]
 Description=Ollama Service
@@ -61,15 +62,37 @@ Type=exec
 ExecStart=/usr/bin/ollama serve
 Environment=HOME=$HOME
 Environment=OLLAMA_HOST=0.0.0.0
+Environment=HSA_OVERRIDE_GFX_VERSION=10.3.0
+Environment=ROCR_VISIBLE_DEVICES=0
+Environment=HIP_VISIBLE_DEVICES=0
 Restart=always
 RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
 EOF
+
   systemctl enable -q --now ollama
   sed -i 's/ENABLE_OLLAMA_API=false/ENABLE_OLLAMA_API=true/g' /opt/open-webui/.env
   msg_ok "Installed Ollama"
+
+  # --- AMD ROCm installation ---
+  msg_info "Installing ROCm for AMD GPU"
+  curl -fsSLO -C - https://ollama.com/download/ollama-linux-amd64-rocm.tgz
+  tar -C /usr -xzf ollama-linux-amd64-rocm.tgz
+  rm -rf ollama-linux-amd64-rocm.tgz
+  msg_ok "ROCm libraries installed for AMD GPU"
+
+  # --- ROCm GPU permissions ---
+  msg_info "Configuring permissions for ROCm GPU access"
+  $SUDO usermod -a -G video,render $LOGNAME
+  # Optionally add other users
+  # $SUDO usermod -a -G video,render user1
+  # $SUDO usermod -a -G video,render user2
+  echo 'ADD_EXTRA_GROUPS=1' | $SUDO tee -a /etc/adduser.conf
+  echo 'EXTRA_GROUPS=video' | $SUDO tee -a /etc/adduser.conf
+  echo 'EXTRA_GROUPS=render' | $SUDO tee -a /etc/adduser.conf
+  msg_ok "ROCm GPU permissions configured"
 fi
 
 msg_info "Creating Service"
