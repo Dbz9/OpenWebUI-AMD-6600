@@ -50,7 +50,7 @@ msg_ok "Installed Open WebUI"
 read -r -p "${TAB3}Would you like to add Ollama? <y/N> " prompt
 if [[ ${prompt,,} =~ ^(y|yes)$ ]]; then
   msg_info "Installing Ollama"
-  curl --progress-bar --http1.1 --retry 5 --retry-delay 10 --keepalive-time 60 --max-time 7200 -C - -fsSLO --limit-rate 3M https://ollama.com/download/ollama-linux-amd64.tgz
+  wget -c --tries=5 --waitretry=10 --timeout=7200 --limit-rate=3M -O https://ollama.com/download/ollama-linux-amd64.tgz
   tar -C /usr -xzf ollama-linux-amd64.tgz
   rm -rf ollama-linux-amd64.tgz
 
@@ -80,7 +80,7 @@ EOF
 
   # --- AMD ROCm installation ---
   msg_info "Installing ROCm for AMD GPU"
-  curl --progress-bar --http1.1 --retry 5 --retry-delay 10 --keepalive-time 60 --max-time 7200 -C - -fsSLO --limit-rate 3M https://ollama.com/download/ollama-linux-amd64-rocm.tgz
+  wget -c --tries=5 --waitretry=10 --timeout=7200 --limit-rate=3M -O https://ollama.com/download/ollama-linux-amd64-rocm.tgz
   tar -C /usr -xzf ollama-linux-amd64-rocm.tgz
   rm -rf ollama-linux-amd64-rocm.tgz
   msg_ok "ROCm libraries installed for AMD GPU"

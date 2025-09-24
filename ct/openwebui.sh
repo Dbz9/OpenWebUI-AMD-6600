@@ -36,7 +36,7 @@ function update_script() {
       msg_info "Stopping Service"
       systemctl stop ollama
       msg_ok "Stopped Service"
-      curl --progress-bar --http1.1 --retry 5 --retry-delay 10 --keepalive-time 60 --max-time 7200 -C - -fsSLO --limit-rate 3M https://ollama.com/download/ollama-linux-amd64.tgz
+      wget -c --tries=5 --waitretry=10 --timeout=7200 --limit-rate=3M -O https://ollama.com/download/ollama-linux-amd64.tgz
       rm -rf /usr/lib/ollama
       rm -rf /usr/bin/ollama
       tar -C /usr -xzf ollama-linux-amd64.tgz
@@ -51,7 +51,7 @@ function update_script() {
 
     # --- AMD ROCm update ---
     msg_info "Updating ROCm libraries for AMD GPU"
-    curl --progress-bar --http1.1 --retry 5 --retry-delay 10 --keepalive-time 60 --max-time 7200 -C - -fsSLO --limit-rate 3M https://ollama.com/download/ollama-linux-amd64-rocm.tgz
+    wget -c --tries=5 --waitretry=10 --timeout=7200 --limit-rate=3M -O https://ollama.com/download/ollama-linux-amd64-rocm.tgz
     tar -C /usr -xzf ollama-linux-amd64-rocm.tgz
     rm -rf ollama-linux-amd64-rocm.tgz
     msg_ok "ROCm libraries updated for AMD GPU"
