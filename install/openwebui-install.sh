@@ -87,13 +87,10 @@ EOF
 
   # --- ROCm GPU permissions ---
   msg_info "Configuring permissions for ROCm GPU access"
-  $SUDO usermod -a -G video,render $LOGNAME
-  # Optionally add other users
-  # $SUDO usermod -a -G video,render user1
-  # $SUDO usermod -a -G video,render user2
-  echo 'ADD_EXTRA_GROUPS=1' | $SUDO tee -a /etc/adduser.conf
-  echo 'EXTRA_GROUPS=video' | $SUDO tee -a /etc/adduser.conf
-  echo 'EXTRA_GROUPS=render' | $SUDO tee -a /etc/adduser.conf
+  $STD sudo usermod -a -G render,video $LOGNAME
+  $STD echo 'ADD_EXTRA_GROUPS=1' | sudo tee -a /etc/adduser.conf
+  $STD echo 'EXTRA_GROUPS=video' | sudo tee -a /etc/adduser.conf
+  $STD echo 'EXTRA_GROUPS=render' | sudo tee -a /etc/adduser.conf
   msg_ok "ROCm GPU permissions configured"
 fi
 

@@ -88,20 +88,13 @@ start
 build_container
 description
 
-# --- Automatic ROCm GPU permissions ---
-msg_info "Configuring ROCm GPU access for current user"
-SUDO=""
-[ "$(id -u)" -ne 0 ] && SUDO="sudo"
-
-# Add current user to video and render groups
-$SUDO usermod -a -G video,render $LOGNAME
-
-# Ensure all future users are added to video and render groups
-echo 'ADD_EXTRA_GROUPS=1' | $SUDO tee -a /etc/adduser.conf
-echo 'EXTRA_GROUPS=video' | $SUDO tee -a /etc/adduser.conf
-echo 'EXTRA_GROUPS=render' | $SUDO tee -a /etc/adduser.conf
-
-msg_ok "ROCm GPU permissions configured. Log out and back in for changes to take effect."
+  # --- ROCm GPU permissions ---
+  msg_info "Configuring permissions for ROCm GPU access"
+  $STD sudo usermod -a -G render,video $LOGNAME
+  $STD echo 'ADD_EXTRA_GROUPS=1' | sudo tee -a /etc/adduser.conf
+  $STD echo 'EXTRA_GROUPS=video' | sudo tee -a /etc/adduser.conf
+  $STD echo 'EXTRA_GROUPS=render' | sudo tee -a /etc/adduser.conf
+  msg_ok "ROCm GPU permissions configured"
 
 msg_ok "Completed Successfully!\n"
 echo -e "${CREATING}${GN}${APP} setup has been successfully initialized!${CL}"
