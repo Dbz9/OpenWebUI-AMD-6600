@@ -52,16 +52,22 @@ if [[ ${prompt,,} =~ ^(y|yes)$ ]]; then
   # --- Ollama installation ---
   msg_info "Installing Ollama"
 
-  LATEST_OLLAMA_URL=$(curl -s https://api.github.com/repos/ollama/ollama/releases/latest \
-    | grep "browser_download_url.*ollama-linux-amd64.tgz" \
-    | cut -d '"' -f 4)
+  while true; do
+    LATEST_OLLAMA_URL=$(curl -s https://api.github.com/repos/ollama/ollama/releases/latest \
+      | grep "browser_download_url.*ollama-linux-amd64.tgz" \
+      | cut -d '"' -f 4)
 
-  if [[ -z "$LATEST_OLLAMA_URL" ]]; then
-    msg_error "Could not fetch Ollama download URL from GitHub!"
-    exit 1
-  fi
+    if [[ -z "$LATEST_OLLAMA_URL" ]]; then
+      msg_error "Could not fetch Ollama download URL from GitHub!"
+      exit 1
+    fi
 
-  wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64.tgz "$LATEST_OLLAMA_URL"
+    echo "Downloading Ollama from: $LATEST_OLLAMA_URL"
+    wget -c --progress=bar:force --timeout=7200 -O ollama-linux-amd64.tgz "$LATEST_OLLAMA_URL" && break
+    echo "Download failed or JWT expired. Retrying with fresh URL in 10s..."
+    sleep 10
+  done
+
   tar -C /usr -xzf ollama-linux-amd64.tgz
   rm -rf ollama-linux-amd64.tgz
 
@@ -92,16 +98,22 @@ EOF
   # --- AMD ROCm installation ---
   msg_info "Installing ROCm for AMD GPU"
 
-  LATEST_ROCM_URL=$(curl -s https://api.github.com/repos/ollama/ollama/releases/latest \
-    | grep "browser_download_url.*ollama-linux-amd64-rocm.tgz" \
-    | cut -d '"' -f 4)
+  while true; do
+    LATEST_ROCM_URL=$(curl -s https://api.github.com/repos/ollama/ollama/releases/latest \
+      | grep "browser_download_url.*ollama-linux-amd64-rocm.tgz" \
+      | cut -d '"' -f 4)
 
-  if [[ -z "$LATEST_ROCM_URL" ]]; then
-    msg_error "Could not fetch ROCm download URL from GitHub!"
-    exit 1
-  fi
+    if [[ -z "$LATEST_ROCM_URL" ]]; then
+      msg_error "Could not fetch ROCm download URL from GitHub!"
+      exit 1
+    fi
 
-  wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64-rocm.tgz "$LATEST_ROCM_URL"
+    echo "Downloading ROCm from: $LATEST_ROCM_URL"
+    wget -c --progress=bar:force --timeout=7200 -O ollama-linux-amd64-rocm.tgz "$LATEST_ROCM_URL" && break
+    echo "Download failed or JWT expired. Retrying with fresh URL in 10s..."
+    sleep 10
+  done
+
   tar -C /usr -xzf ollama-linux-amd64-rocm.tgz
   rm -rf ollama-linux-amd64-rocm.tgz
   msg_ok "ROCm libraries installed for AMD GPU"
