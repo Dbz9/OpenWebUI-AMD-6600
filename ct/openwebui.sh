@@ -36,11 +36,17 @@ function update_script() {
       msg_info "Stopping Service"
       systemctl stop ollama
       msg_ok "Stopped Service"
-      wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64.tgz https://ollama.com/download/ollama-linux-amd64.tgz
+
+      LATEST_OLLAMA_URL=$(curl -s https://api.github.com/repos/ollama/ollama/releases/latest \
+        | grep "browser_download_url.*ollama-linux-amd64.tgz" \
+        | cut -d '"' -f 4)
+
+      wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64.tgz "$LATEST_OLLAMA_URL"
       rm -rf /usr/lib/ollama
       rm -rf /usr/bin/ollama
       tar -C /usr -xzf ollama-linux-amd64.tgz
       rm -rf ollama-linux-amd64.tgz
+
       msg_info "Starting Service"
       systemctl start ollama
       msg_info "Started Service"
@@ -51,7 +57,12 @@ function update_script() {
 
     # --- AMD ROCm update ---
     msg_info "Updating ROCm libraries for AMD GPU"
-    wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64-rocm.tgz https://ollama.com/download/ollama-linux-amd64-rocm.tgz
+
+    LATEST_ROCM_URL=$(curl -s https://api.github.com/repos/ollama/ollama/releases/latest \
+      | grep "browser_download_url.*ollama-linux-amd64-rocm.tgz" \
+      | cut -d '"' -f 4)
+
+    wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64-rocm.tgz "$LATEST_ROCM_URL"
     tar -C /usr -xzf ollama-linux-amd64-rocm.tgz
     rm -rf ollama-linux-amd64-rocm.tgz
     msg_ok "ROCm libraries updated for AMD GPU"
@@ -88,13 +99,13 @@ start
 build_container
 description
 
-  # --- ROCm GPU permissions ---
-  msg_info "Configuring permissions for ROCm GPU access"
-  $STD sudo usermod -a -G render,video $LOGNAME
-  $STD echo 'ADD_EXTRA_GROUPS=1' | sudo tee -a /etc/adduser.conf
-  $STD echo 'EXTRA_GROUPS=video' | sudo tee -a /etc/adduser.conf
-  $STD echo 'EXTRA_GROUPS=render' | sudo tee -a /etc/adduser.conf
-  msg_ok "ROCm GPU permissions configured"
+# --- ROCm GPU permissions ---
+msg_info "Configuring permissions for ROCm GPU access"
+$STD sudo usermod -a -G render,video $LOGNAME
+$STD echo 'ADD_EXTRA_GROUPS=1' | sudo tee -a /etc/adduser.conf
+$STD echo 'EXTRA_GROUPS=video' | sudo tee -a /etc/adduser.conf
+$STD echo 'EXTRA_GROUPS=render' | sudo tee -a /etc/adduser.conf
+msg_ok "ROCm GPU permissions configured"
 
 msg_ok "Completed Successfully!\n"
 echo -e "${CREATING}${GN}${APP} setup has been successfully initialized!${CL}"

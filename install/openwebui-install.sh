@@ -49,8 +49,19 @@ msg_ok "Installed Open WebUI"
 
 read -r -p "${TAB3}Would you like to add Ollama? <y/N> " prompt
 if [[ ${prompt,,} =~ ^(y|yes)$ ]]; then
+  # --- Ollama installation ---
   msg_info "Installing Ollama"
-  wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64.tgz https://ollama.com/download/ollama-linux-amd64.tgz
+
+  LATEST_OLLAMA_URL=$(curl -s https://api.github.com/repos/ollama/ollama/releases/latest \
+    | grep "browser_download_url.*ollama-linux-amd64.tgz" \
+    | cut -d '"' -f 4)
+
+  if [[ -z "$LATEST_OLLAMA_URL" ]]; then
+    msg_error "Could not fetch Ollama download URL from GitHub!"
+    exit 1
+  fi
+
+  wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64.tgz "$LATEST_OLLAMA_URL"
   tar -C /usr -xzf ollama-linux-amd64.tgz
   rm -rf ollama-linux-amd64.tgz
 
@@ -80,7 +91,17 @@ EOF
 
   # --- AMD ROCm installation ---
   msg_info "Installing ROCm for AMD GPU"
-  wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64-rocm.tgz https://ollama.com/download/ollama-linux-amd64-rocm.tgz
+
+  LATEST_ROCM_URL=$(curl -s https://api.github.com/repos/ollama/ollama/releases/latest \
+    | grep "browser_download_url.*ollama-linux-amd64-rocm.tgz" \
+    | cut -d '"' -f 4)
+
+  if [[ -z "$LATEST_ROCM_URL" ]]; then
+    msg_error "Could not fetch ROCm download URL from GitHub!"
+    exit 1
+  fi
+
+  wget -c --tries=5 --waitretry=10 --timeout=7200 -O ollama-linux-amd64-rocm.tgz "$LATEST_ROCM_URL"
   tar -C /usr -xzf ollama-linux-amd64-rocm.tgz
   rm -rf ollama-linux-amd64-rocm.tgz
   msg_ok "ROCm libraries installed for AMD GPU"
