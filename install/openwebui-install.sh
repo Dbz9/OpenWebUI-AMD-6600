@@ -118,13 +118,13 @@ EOF
   rm -rf ollama-linux-amd64-rocm.tgz
   msg_ok "ROCm libraries installed for AMD GPU"
 
-  # --- ROCm GPU permissions ---
-  msg_info "Configuring permissions for ROCm GPU access"
-  $STD sudo usermod -a -G render,video $LOGNAME
-  $STD echo 'ADD_EXTRA_GROUPS=1' | sudo tee -a /etc/adduser.conf
-  $STD echo 'EXTRA_GROUPS=video' | sudo tee -a /etc/adduser.conf
-  $STD echo 'EXTRA_GROUPS=render' | sudo tee -a /etc/adduser.conf
-  msg_ok "ROCm GPU permissions configured"
+# --- ROCm GPU permissions ---
+# msg_info "Configuring permissions for ROCm GPU access"
+# $STD sudo usermod -a -G render,video $LOGNAME
+# $STD echo 'ADD_EXTRA_GROUPS=1' | sudo tee -a /etc/adduser.conf
+# $STD echo 'EXTRA_GROUPS=video' | sudo tee -a /etc/adduser.conf
+# $STD echo 'EXTRA_GROUPS=render' | sudo tee -a /etc/adduser.conf
+# msg_ok "ROCm GPU permissions configured"
 fi
 
 msg_info "Creating Service"
